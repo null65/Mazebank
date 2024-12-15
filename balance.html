@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Maze Bank - Transfer Funds</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #F2F2F2;
+        }
+
+        .container {
+            background-color: #fff;
+            border: 1px solid #ccc;
+            padding: 20px;
+            border-radius: 5px;
+            box-shadow: 0px 2px 5px rgba(0, 0, 0, 0.1);
+            text-align: center;
+        }
+
+        .balance-container {
+            margin-bottom: 20px;
+        }
+
+        .balance-container h2 {
+            color: #8B0000;
+            font-size: 24px;
+        }
+
+        .form-button {
+            background-color: #8B0000;
+            color: #fff;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+        .form-label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+
+        .form-input {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 3px;
+        }
+
+        .alert {
+            padding: 15px;
+            border-radius: 5px;
+            margin-bottom: 15px;
+        }
+
+        .alert-success {
+            background-color: #D4EDDA;
+            border-color: #C3E6CB;
+            color: #155724;
+        }
+
+        .alert-danger {
+            background-color: #FFD7D7;
+            border-color: #FFCCCC;
+            color: #8B0000;
+        }
+
+        #transaction-history {
+            margin-top: 20px;
+        }
+
+        #transaction-history h2 {
+            color: #8B0000;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="balance-container">
+            <h2>Your Current Balance: $<span id="balance">887263</span></h2>
+        </div>
+
+        <button class="form-button" id="transfer-button">Transfer Funds</button>
+
+        <div id="transfer-form" style="display: none;">
+            <h2>Transfer Funds</h2>
+            <div class="form-group">
+                <label class="form-label" for="recipient-name">Recipient Name:</label>
+                <input type="text" class="form-input" id="recipient-name">
+            </div>
+            <div class="form-group">
+                <label class="form-label" for="account-number">Account Number:</label>
+                <input type="text" class="form-input" id="account-number">
+            </div>
+            <div class="form-group">
+                <label class="form-label" for="sort-code">Sort Code:</label>
+                <input type="text" class="form-input" id="sort-code">
+            </div>
+            <div class="form-group">
+                <label class="form-label" for="amount">Amount to Transfer:</label>
+                <input type="number" class="form-input" id="amount">
+            </div>
+            <button class="form-button" id="confirm-transfer">Confirm Transfer</button>
+            <button class="form-button" id="cancel-transfer">Cancel</button>
+        </div>
+
+        <div id="transaction-history">
+            <h2>Transaction History</h2>
+            <ul id="transaction-list"></ul>
+        </div>
+
+        <div id="alert"></div>
+
+        <script>
+            const balanceDisplay = document.getElementById('balance');
+            const transferButton = document.getElementById('transfer-button');
+            const transferForm = document.getElementById('transfer-form');
+            const confirmTransferButton = document.getElementById('confirm-transfer');
+            const cancelTransferButton = document.getElementById('cancel-transfer');
+            const recipientNameInput = document.getElementById('recipient-name');
+            const accountNumberInput = document.getElementById('account-number');
+            const sortCodeInput = document.getElementById('sort-code');
+            const amountInput = document.getElementById('amount');
+            const transactionList = document.getElementById('transaction-list');
+            const alertDiv = document.getElementById('alert');
+
+            let balance = 887263;
+
+            transferButton.addEventListener('click', () => {
+                transferForm.style.display = 'block';
+            });
+
+            cancelTransferButton.addEventListener('click', () => {
+                transferForm.style.display = 'none';
+            });
+
+            confirmTransferButton.addEventListener('click', () => {
+                const recipientName = recipientNameInput.value;
+                const accountNumber = accountNumberInput.value;
+                const sortCode = sortCodeInput.value;
+                const amount = parseFloat(amountInput.value);
+
+                if (amount <= 0 || isNaN(amount)) {
+                    showAlert('Invalid amount. Please enter a positive number.');
+                    return;
+                }
+
+                if (amount > balance) {
+                    showAlert('Insufficient funds.');
+                    return;
+                }
+
+                balance -= amount;
+                balanceDisplay.textContent = balance.toFixed(2);
+
+                const transactionItem = document.createElement('li');
+                transactionItem.textContent = `Transferred $${amount} to ${recipientName} (Account: ${accountNumber}, Sort Code: ${sortCode})`;
+                transactionList.appendChild(transactionItem);
+
+                showAlert('Transfer successful!', 'success');
+                transferForm.style.display = 'none';
+
+                // Clear input fields
+                recipientNameInput.value = '';
+                accountNumberInput.value = '';
+                sortCodeInput.value = '';
+                amountInput.value = '';
+
+                // Automatically hide the alert after 5 seconds
+                setTimeout(() => {
+                    alertDiv.innerHTML = '';
+                }, 5000);
+            });
+
+            function showAlert(message, type = 'danger') {
+                alertDiv.innerHTML = `<div class="alert alert-${type}">${message}</div>`;
+            }
+        </script>
+    </body>
+</html>
